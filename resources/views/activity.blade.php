@@ -38,21 +38,25 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            <table id="example1" class="table table-bordered table-striped">
+                            <table id="available-users-table" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>Consultor</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {{-- @foreach ($consultores as $consultor) --}}
-                                        <tr>
-                                            <td style="vertical-align:middle;">{{-- $consultor->name --}}NOMBRE CONSULTOR</td>
+                                <tbody id="available-users-tbody">
+                                    @forelse ($consultantUsers as $item)
+                                        <tr id="avalaible-{{ $item->co_usuario }}">
+                                            <td style="vertical-align:middle;">{{ $item->no_usuario }}</td>
                                             <td align="center">
-                                                <button class="btn btn-primary"> <i class='bx bxs-user-plus bx-sm' ></i> </button> 
+                                                <button class="btn-add-user btn btn-primary" class="btn btn-primary"> <i class='bx bxs-user-plus bx-sm' ></i> </button> 
                                             </td>
                                         </tr>
-                                    {{-- @endforeach --}}
+                                    @empty
+                                        <tr>
+                                            <td>No hay consultores disponibles</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -74,19 +78,14 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            <table id="example1" class="table table-bordered table-striped">
+                            <table id="selected-users-table" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>Consultor</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                        <tr>
-                                            <td style="vertical-align:middle;">NOMBRE CONSULTOR</td>
-                                            <td align="center">
-                                                <button class="btn btn-danger"> <i class='bx bxs-user-minus bx-sm' ></i></button>
-                                            </td>
-                                        </tr>
+                                <tbody id="selected-users-tbody">
+
                                 </tbody>
                                 <tfoot>
                                     <tr>
