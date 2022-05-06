@@ -2079,13 +2079,13 @@ var Global = /*#__PURE__*/function () {
   _createClass(Global, [{
     key: "initialize",
     value: function initialize() {
-      this.getConsultantUser();
+      this.moveConsultantUser();
     }
   }, {
-    key: "getConsultantUser",
-    value: function getConsultantUser() {
+    key: "moveConsultantUser",
+    value: function moveConsultantUser() {
       var selectedUsersTbody = document.getElementById('selected-users-tbody');
-      var btnsAdd = document.getElementsByClassName('btn-add-user');
+      var btns = document.getElementsByClassName('btn-move'); // Agregar fila de aviso de que no hay usuarios seleccionados
 
       if (selectedUsersTbody == null) {
         return;
@@ -2099,68 +2099,157 @@ var Global = /*#__PURE__*/function () {
         }
       }
 
-      if (btnsAdd == null) {
+      if (btns == null) {
         return;
       }
 
-      [].forEach.call(btnsAdd, function (btn) {
+      [].forEach.call(btns, function (btn) {
+        //Mover usuarios consultantes
         btn.addEventListener('click', function () {
-          var tr = document.getElementById('selected-empty-row');
+          var tableParent = btn.parentNode.parentNode.parentNode.id;
 
-          if (tr != null) {
-            tr.remove();
-          }
-
-          var avaliableUsersTbody = document.getElementById('available-users-tbody');
-
-          if (avaliableUsersTbody == null) {
+          if (tableParent == null) {
             return;
-          } else {
-            var avaliableUsersLength = avaliableUsersTbody.children.length;
-            console.log(avaliableUsersLength);
-
-            if (avaliableUsersLength == 1) {
-              console.log('No hay consultores disponibles');
-
-              var _tr = document.createElement('tr');
-
-              _tr.innerHTML = "\n                                <td id=\"avalaible-empty-row\">No hay consultores disponibles</td>\n                            ";
-              avaliableUsersTbody.appendChild(_tr);
-            }
-          } // const trAvalaibleEmpty = document.getElementById('avalaible-empty-row');
-          // if(avaliableUsersLength == 1 && trAvalaibleEmpty != null){
-          //     trAvalaibleEmpty.remove();
-          // }
-
+          }
 
           var co_usuario = btn.parentNode.parentNode.id;
-          var trAvaliable = document.getElementById(co_usuario);
+          var avaliableUsersTbody = document.getElementById('available-users-tbody'); // Mover usuario a la tabla de consultores seleccionados
 
-          if (trAvaliable != null) {
-            trAvaliable.remove();
-          }
+          if (tableParent == 'available-users-tbody') {
+            // Remover fila vacia si aun existe 
+            var _tr = document.getElementById('selected-empty-row');
 
-          var co_usuario_split = co_usuario.split('-');
-          var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-          fetch("/consultant-users/".concat(co_usuario_split[1]), {
-            method: 'GET',
-            headers: {
-              'X-CSRF-TOKEN': token
-            }
-          }).then(function (response) {
-            return response.json();
-          }).then(function (data) {
-            console.log(data.data);
+            if (_tr != null) {
+              _tr.remove();
+            } // verificar si no existen usuarios seleccionados
 
-            if (selectedUsersTbody == null) {
+
+            if (avaliableUsersTbody == null) {
               return;
-            }
+            } else {
+              var avaliableUsersLength = avaliableUsersTbody.children.length;
 
-            var tr = document.createElement('tr');
-            tr.id = data.data.co_usuario;
-            tr.innerHTML = "\n                        <td style=\"vertical-align:middle;\">".concat(data.data.no_usuario, "</td>\n                        <td align=\"center\"><button class=\"btn btn-danger\"> <i class='bx bxs-user-minus bx-sm' ></i></button></td>\n                        ");
-            selectedUsersTbody.appendChild(tr);
-          });
+              if (avaliableUsersLength == 1) {
+                console.log('No hay consultores disponibles');
+
+                var _tr2 = document.createElement('tr');
+
+                _tr2.innerHTML = "\n                                    <td id=\"avalaible-empty-row\">No hay consultores disponibles</td>\n                                ";
+                avaliableUsersTbody.appendChild(_tr2);
+              }
+            } // remover el usuario de la tabla de consultores disponibles
+
+
+            var trAvaliable = document.getElementById(co_usuario);
+
+            if (trAvaliable != null) {
+              trAvaliable.remove();
+            } // obtener datos del usuario seleccionado 
+
+
+            var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch("/consultant-users/".concat(co_usuario), {
+              method: 'GET',
+              headers: {
+                'X-CSRF-TOKEN': token
+              }
+            }).then(function (response) {
+              return response.json();
+            }).then(function (data) {
+              var idUser = data.data.co_usuario;
+              var nameUser = data.data.no_usuario; // añadir usuario a la tabla de usuarios seleccionados
+
+              var tr = document.createElement('tr');
+              tr.setAttribute('id', idUser);
+              tr.id = idUser;
+              tr.innerHTML = "\n                            <td style=\"vertical-align:middle;\">".concat(nameUser, "</td>\n                        ");
+              var tdBtn = document.createElement('td');
+              tdBtn.setAttribute('align', 'center');
+
+              if (btn.hasChildNodes() && btn.firstChild) {
+                btn.removeChild(btn.firstChild);
+              }
+
+              btn.setAttribute('class', 'btn-move btn btn-danger');
+              btn.innerHTML = '<i class="bx bx-chevron-left bx-sm"></i>';
+              tdBtn.appendChild(btn);
+              tr.appendChild(tdBtn);
+              selectedUsersTbody.appendChild(tr); // ordenar tabla de consultores seleccionados por nombre
+
+              var trs = selectedUsersTbody.children;
+              var trsArray = [];
+
+              for (var i = 0; i < trs.length; i++) {
+                trsArray.push(trs[i]);
+              }
+
+              trsArray.sort(function (a, b) {
+                var textA = a.innerText.toUpperCase();
+                var textB = b.innerText.toUpperCase();
+                return textA < textB ? -1 : textA > textB ? 1 : 0;
+              });
+
+              for (var _i = 0; _i < trsArray.length; _i++) {
+                selectedUsersTbody.appendChild(trsArray[_i]);
+              }
+            }); // Mover usuario a la tabla de consultores disponibles
+          } else if (tableParent == 'selected-users-tbody') {
+            // obtener datos del usuario seleccionado 
+            var _token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch("/consultant-users/".concat(co_usuario), {
+              method: 'GET',
+              headers: {
+                'X-CSRF-TOKEN': _token
+              }
+            }).then(function (response) {
+              return response.json();
+            }).then(function (data) {
+              var idUser = btn.parentNode.parentNode.id;
+              var nameUser = data.data.no_usuario; // remover el usuario de la tabla de usuarios seleccionados
+
+              var trSelected = document.getElementById(idUser);
+
+              if (trSelected != null) {
+                trSelected.remove();
+              } // devolver usuario a la tabla de consultores disponibles
+
+
+              var tr = document.createElement('tr');
+              tr.setAttribute('id', idUser);
+              tr.id = idUser;
+              tr.innerHTML = "\n                            <td style=\"vertical-align:middle;\">".concat(nameUser, "</td>\n                        ");
+              var tdBtn = document.createElement('td');
+              tdBtn.setAttribute('align', 'center');
+
+              if (btn.hasChildNodes() && btn.firstChild) {
+                btn.removeChild(btn.firstChild);
+              }
+
+              btn.setAttribute('class', 'btn-move btn btn-primary');
+              btn.innerHTML = '<i class="bx bx-chevron-right bx-sm"></i>';
+              tdBtn.appendChild(btn);
+              tr.appendChild(tdBtn);
+              avaliableUsersTbody.appendChild(tr); // ordenar tabla de consultores disponibles por nombre
+
+              var trs = avaliableUsersTbody.children;
+              var trsArray = [];
+
+              for (var i = 0; i < trs.length; i++) {
+                trsArray.push(trs[i]);
+              }
+
+              trsArray.sort(function (a, b) {
+                var textA = a.innerText.toUpperCase();
+                var textB = b.innerText.toUpperCase();
+                return textA < textB ? -1 : textA > textB ? 1 : 0;
+              });
+
+              for (var _i2 = 0; _i2 < trsArray.length; _i2++) {
+                avaliableUsersTbody.appendChild(trsArray[_i2]);
+              }
+            });
+          }
         });
       });
     }

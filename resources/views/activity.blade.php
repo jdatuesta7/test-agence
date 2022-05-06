@@ -46,10 +46,10 @@
                                 </thead>
                                 <tbody id="available-users-tbody">
                                     @forelse ($consultantUsers as $item)
-                                        <tr id="avalaible-{{ $item->co_usuario }}">
+                                        <tr id="{{ $item->co_usuario }}">
                                             <td style="vertical-align:middle;">{{ $item->no_usuario }}</td>
                                             <td align="center">
-                                                <button class="btn-add-user btn btn-primary" class="btn btn-primary"> <i class='bx bxs-user-plus bx-sm' ></i> </button> 
+                                                <button class="btn-move btn btn-primary"> <i class='bx bx-chevron-right bx-sm' ></i> </button> 
                                             </td>
                                         </tr>
                                     @empty
