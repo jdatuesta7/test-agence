@@ -49,7 +49,7 @@
                                         <tr id="{{ $item->co_usuario }}">
                                             <td style="vertical-align:middle;">{{ $item->no_usuario }}</td>
                                             <td align="center">
-                                                <button class="btn-move btn btn-primary"> <i class='bx bx-chevron-right bx-sm' ></i> </button> 
+                                                <button type="button" class="btn-move btn btn-primary"> <i class='bx bx-chevron-right bx-sm' ></i> </button> 
                                             </td>
                                         </tr>
                                     @empty
@@ -72,37 +72,43 @@
 
 
                 <div class="col-md-6 col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Consultores seleccionados</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body">
-                            <table id="selected-users-table" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Consultor</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="selected-users-tbody">
+                    <form method="POST" id="form" action="generate-report">
+                        @csrf
 
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th>Consultor</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Consultores seleccionados</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <table id="selected-users-table" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Consultor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selected-users-tbody">
+                                        <tr id="selected-empty-row">
+                                            <td>No ha seleccionado consultores</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Consultor</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
                         </div>
-                        <!-- /.card-body -->
-                    </div>
                     <!-- /.card -->
+                    </form>
                 </div>
             </div>
 
             <div class="row gap-1 mt-4 text-center">
                 <div class="col-md-3 col-12">
-                    <button type="button" class="btn btn-primary btn-block col-11">Reporte <i class='bx bxs-report'></i></button>
+                    <button id="report-btn" type="button" class="btn btn-primary btn-block col-11">Reporte <i class='bx bxs-report'></i></button>
                 </div>
                 <div class="col-md-3 col-12">
                     <button type="button" class="btn btn-secondary btn-block col-11">Gráfico <i class='bx bx-line-chart'></i></button>

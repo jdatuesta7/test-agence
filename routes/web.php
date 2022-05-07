@@ -16,5 +16,6 @@ use App\Http\Controllers\ActivityController;
 
 Route::get('/', [ActivityController::class, 'index']);
 
-Route::get('/consultant-users/{co_usuario}', [ActivityController::class, 'addConsultantUser']);
+Route::get('/consultant-user/{co_usuario}', [ActivityController::class, 'getConsultantUser']);
 
+Route::post('/generate-report', [ActivityController::class, 'generateReport']);

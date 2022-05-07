@@ -2080,23 +2080,16 @@ var Global = /*#__PURE__*/function () {
     key: "initialize",
     value: function initialize() {
       this.moveConsultantUser();
+      this.generateReport();
     }
   }, {
     key: "moveConsultantUser",
     value: function moveConsultantUser() {
       var selectedUsersTbody = document.getElementById('selected-users-tbody');
-      var btns = document.getElementsByClassName('btn-move'); // Agregar fila de aviso de que no hay usuarios seleccionados
+      var btns = document.getElementsByClassName('btn-move');
 
       if (selectedUsersTbody == null) {
         return;
-      } else {
-        var selectedUsersLength = selectedUsersTbody.children.length;
-
-        if (selectedUsersLength == 0) {
-          var tr = document.createElement('tr');
-          tr.innerHTML = "\n                        <td id=\"selected-empty-row\">No ha seleccionado consultores</td>\n                    ";
-          selectedUsersTbody.appendChild(tr);
-        }
       }
 
       if (btns == null) {
@@ -2117,10 +2110,10 @@ var Global = /*#__PURE__*/function () {
 
           if (tableParent == 'available-users-tbody') {
             // Remover fila vacia si aun existe 
-            var _tr = document.getElementById('selected-empty-row');
+            var tr = document.getElementById('selected-empty-row');
 
-            if (_tr != null) {
-              _tr.remove();
+            if (tr != null) {
+              tr.remove();
             } // verificar si no existen usuarios seleccionados
 
 
@@ -2130,12 +2123,18 @@ var Global = /*#__PURE__*/function () {
               var avaliableUsersLength = avaliableUsersTbody.children.length;
 
               if (avaliableUsersLength == 1) {
-                console.log('No hay consultores disponibles');
+                var _tr = document.createElement('tr');
 
-                var _tr2 = document.createElement('tr');
+                _tr.setAttribute('id', 'avalaible-empty-row');
 
-                _tr2.innerHTML = "\n                                    <td id=\"avalaible-empty-row\">No hay consultores disponibles</td>\n                                ";
-                avaliableUsersTbody.appendChild(_tr2);
+                _tr.innerHTML = "\n                                    <td>No hay consultores disponibles</td>\n                                ";
+                avaliableUsersTbody.appendChild(_tr);
+              } else {
+                var trEmpty = document.getElementById('avalaible-empty-row');
+
+                if (trEmpty != null) {
+                  trEmpty.remove();
+                }
               }
             } // remover el usuario de la tabla de consultores disponibles
 
@@ -2148,7 +2147,7 @@ var Global = /*#__PURE__*/function () {
 
 
             var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            fetch("/consultant-users/".concat(co_usuario), {
+            fetch("/consultant-user/".concat(co_usuario), {
               method: 'GET',
               headers: {
                 'X-CSRF-TOKEN': token
@@ -2157,7 +2156,15 @@ var Global = /*#__PURE__*/function () {
               return response.json();
             }).then(function (data) {
               var idUser = data.data.co_usuario;
-              var nameUser = data.data.no_usuario; // añadir usuario a la tabla de usuarios seleccionados
+              var nameUser = data.data.no_usuario; // añadir campo oculto con la id del usuario
+
+              var input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = 'selected_users[]';
+              input.value = idUser;
+              input.id = idUser;
+              var form = document.getElementById('form');
+              form.appendChild(input); // añadir usuario a la tabla de usuarios seleccionados
 
               var tr = document.createElement('tr');
               tr.setAttribute('id', idUser);
@@ -2171,6 +2178,7 @@ var Global = /*#__PURE__*/function () {
               }
 
               btn.setAttribute('class', 'btn-move btn btn-danger');
+              btn.setAttribute('type', 'button');
               btn.innerHTML = '<i class="bx bx-chevron-left bx-sm"></i>';
               tdBtn.appendChild(btn);
               tr.appendChild(tdBtn);
@@ -2197,7 +2205,7 @@ var Global = /*#__PURE__*/function () {
             // obtener datos del usuario seleccionado 
             var _token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch("/consultant-users/".concat(co_usuario), {
+            fetch("/consultant-user/".concat(co_usuario), {
               method: 'GET',
               headers: {
                 'X-CSRF-TOKEN': _token
@@ -2206,12 +2214,31 @@ var Global = /*#__PURE__*/function () {
               return response.json();
             }).then(function (data) {
               var idUser = btn.parentNode.parentNode.id;
-              var nameUser = data.data.no_usuario; // remover el usuario de la tabla de usuarios seleccionados
+              var nameUser = data.data.no_usuario; // remover el campo oculto con la id del usuario
+
+              var input = document.getElementById(idUser);
+
+              if (input != null) {
+                input.remove();
+              } // remover el usuario de la tabla de usuarios seleccionados
+
 
               var trSelected = document.getElementById(idUser);
 
               if (trSelected != null) {
                 trSelected.remove();
+              } // Agregar fila de aviso de que no hay usuarios seleccionados despues de remover todos
+
+
+              var selectedUsersLength = selectedUsersTbody.children.length;
+
+              if (selectedUsersLength == 0) {
+                var _tr2 = document.createElement('tr');
+
+                _tr2.setAttribute('id', 'selected-empty-row');
+
+                _tr2.innerHTML = "\n                                    <td>No ha seleccionado consultores</td>\n                                ";
+                selectedUsersTbody.appendChild(_tr2);
               } // devolver usuario a la tabla de consultores disponibles
 
 
@@ -2230,7 +2257,18 @@ var Global = /*#__PURE__*/function () {
               btn.innerHTML = '<i class="bx bx-chevron-right bx-sm"></i>';
               tdBtn.appendChild(btn);
               tr.appendChild(tdBtn);
-              avaliableUsersTbody.appendChild(tr); // ordenar tabla de consultores disponibles por nombre
+              avaliableUsersTbody.appendChild(tr); // remover fila de aviso de que no hay usuarios despues de devolver al menos un usuario
+
+              var avaliableUsersLength = avaliableUsersTbody.children.length;
+
+              if (avaliableUsersLength > 1) {
+                var _trEmpty = document.getElementById('avalaible-empty-row');
+
+                if (_trEmpty != null) {
+                  _trEmpty.remove();
+                }
+              } // ordenar tabla de consultores disponibles por nombre
+
 
               var trs = avaliableUsersTbody.children;
               var trsArray = [];
@@ -2251,6 +2289,36 @@ var Global = /*#__PURE__*/function () {
             });
           }
         });
+      });
+    }
+  }, {
+    key: "generateReport",
+    value: function generateReport() {
+      var btn = document.getElementById('report-btn');
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var selectedUserTbody = document.getElementById('selected-users-tbody');
+
+        if (selectedUserTbody == null) {
+          return;
+        }
+
+        var selectedUsersRows = selectedUserTbody.children;
+
+        if (selectedUsersRows.length == 0) {
+          alert('No hay consultores seleccionados');
+          return;
+        }
+
+        var selectedIdUsers = [];
+
+        for (var i = 0; i < selectedUsersRows.length; i++) {
+          selectedIdUsers.push(selectedUsersRows[i].id);
+        }
+
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        var form = document.getElementById('form');
+        form.submit();
       });
     }
   }]);

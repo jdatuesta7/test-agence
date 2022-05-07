@@ -19,7 +19,7 @@ class ActivityController extends Controller
         return view('activity', compact('consultantUsers'));
     }
 
-    public function addConsultantUser($co_usuario)
+    public function getConsultantUser($co_usuario)
     {
         $consultantUser = ConsultantUser::find($co_usuario);
 
@@ -30,4 +30,10 @@ class ActivityController extends Controller
         }
 
     }
+
+    public function generateReport(Request $request)
+    {
+        dd($request->all());
+    }
+
 }
