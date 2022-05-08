@@ -25,13 +25,8 @@
                             <tr>
                                 <td>PERIODO</td>
                                 <td>R$ {{ number_format($item['netIncome'], 2, ',', '.') }}</td>
-
-                                @if ($item['fixedCost'] != 'N/A')
-                                    <td>R$ {{ number_format($item['fixedCost'], 2, ',', '.') }}</td>
-                                @else
-                                    <td>N/A</td>
-                                @endif
-                                <td>COMISION</td>
+                                <td>{{ $item['fixedCost'] != 'N/A' ? 'R$ '.number_format($item['fixedCost'], 2, ',', '.') : 'N/A' }}</td>
+                                <td>R$ {{ number_format($item['comission'], 2, ',', '.') }}</td>
                                 <td>GANANCIA</td>
                             </tr>
                         </tbody>
