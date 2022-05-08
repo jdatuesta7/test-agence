@@ -73,7 +73,7 @@ class ActivityController extends Controller
         }
 
         //obtener ganancias netas de cada consultor
-        $netIncome = [];
+        $dataReport = [];
         foreach ($allInvoices as $invoices) {
             $warning = false;
             if(count(($invoices)) != 0) {
@@ -81,17 +81,29 @@ class ActivityController extends Controller
                 foreach ($invoices as $invoice) {
                     $totalValue += $invoice->valor - ($invoice->valor * $invoice->total_imp_inc / 100);
                 }
+                //obtener costo fijo de cada consultor
+                $fixedCost = DB::table("cao_salario")->where("co_usuario", "=", $invoice->co_usuario)->first();
+                if ($fixedCost) {
+                    $dataReport[] = [
+                        'fixedCost' => $fixedCost->brut_salario,
+                        'netIncome' => $totalValue,
+                        'user' => $consultantUser[array_search($invoice->co_usuario, $idUsersSelected['selected_users'])]
+                    ];
+                }else{
+                    $dataReport[] = [
+                        'fixedCost' => 'N/A',
+                        'netIncome' => $totalValue,
+                        'user' => $consultantUser[array_search($invoice->co_usuario, $idUsersSelected['selected_users'])]
+                    ];
+                }
 
-                $netIncome[] = [
-                    'netIncome' => $totalValue,
-                    'user' => $consultantUser[array_search($invoice->co_usuario, $idUsersSelected['selected_users'])]
-                ];
+                
             }else{
                 $warning = true;
             }
         }
 
-        return view('report', compact('netIncome', 'warning'));
+        return view('report', compact('dataReport', 'warning'));
     }
 
 }

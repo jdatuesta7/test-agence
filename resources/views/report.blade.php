@@ -2,7 +2,7 @@
 
 <div class="p-4">
     <h1 class="text-center mt-2 mb-4"> REPORTE DE FACTURAS OBTENIDAS</h1>
-    @foreach ($netIncome as $item)
+    @foreach ($dataReport as $item)
     <div class="row gap-1 mt-4">
         <div class="col-md-12 col-12">
             <div class="card">
@@ -25,7 +25,12 @@
                             <tr>
                                 <td>PERIODO</td>
                                 <td>R$ {{ number_format($item['netIncome'], 2, ',', '.') }}</td>
-                                <td>COSTO FIJO</td>
+
+                                @if ($item['fixedCost'] != 'N/A')
+                                    <td>R$ {{ number_format($item['fixedCost'], 2, ',', '.') }}</td>
+                                @else
+                                    <td>N/A</td>
+                                @endif
                                 <td>COMISION</td>
                                 <td>GANANCIA</td>
                             </tr>
