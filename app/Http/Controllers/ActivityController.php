@@ -48,31 +48,24 @@ class ActivityController extends Controller
         $startDate = $request->startDate;
         $endDate = $request->endDate;
 
-        if ($startDate && $endDate) {
-            foreach ($idUsersSelected['selected_users'] as $idUserSelected) {
-                $allInvoices[] = DB::table("cao_fatura")
-                    ->where("cao_fatura.data_emissao", ">=", $startDate)
-                    ->where("cao_fatura.data_emissao", "<=", $endDate)
-                ->join("cao_os", "cao_fatura.co_os", "=", "cao_os.co_os")
-                    ->where("cao_os.co_usuario", "=", $idUserSelected)
-                ->join("cao_sistema", "cao_fatura.co_sistema", "=", "cao_sistema.co_sistema")
-                    ->where("cao_sistema.co_usuario", "=", $idUserSelected)
-                ->join("cao_cliente", "cao_fatura.co_cliente", "=", "cao_cliente.co_cliente")
-                ->get();
-            }
-        }else{
-            foreach ($idUsersSelected['selected_users'] as $idUserSelected) {
-                $allInvoices[] = DB::table("cao_fatura")
-                ->join("cao_os", "cao_fatura.co_os", "=", "cao_os.co_os")
-                    ->where("cao_os.co_usuario", "=", $idUserSelected)
-                ->join("cao_sistema", "cao_fatura.co_sistema", "=", "cao_sistema.co_sistema")
-                    ->where("cao_sistema.co_usuario", "=", $idUserSelected)
-                ->join("cao_cliente", "cao_fatura.co_cliente", "=", "cao_cliente.co_cliente")
-                ->get();
-            }
+        foreach ($idUsersSelected['selected_users'] as $idUserSelected) {
+            $allInvoices[] = DB::table("cao_fatura")
+                ->where("cao_fatura.data_emissao", ">=", $startDate ? $startDate : '0000-00-00')
+                ->where("cao_fatura.data_emissao", "<=", $endDate ? $endDate : date('Y-m-d'))
+            ->join("cao_os", "cao_fatura.co_os", "=", "cao_os.co_os")
+                ->where("cao_os.co_usuario", "=", $idUserSelected)
+            ->join("cao_sistema", "cao_fatura.co_sistema", "=", "cao_sistema.co_sistema")
+                ->where("cao_sistema.co_usuario", "=", $idUserSelected)
+            ->join("cao_cliente", "cao_fatura.co_cliente", "=", "cao_cliente.co_cliente")
+            ->get();
         }
 
-        //obtener ganancias netas de cada consultor
+        if($startDate && $endDate){
+            $startDate = date('d-m-Y', strtotime($startDate));
+            $endDate = date('d-m-Y', strtotime($endDate));
+        }
+
+        //obtener datos del reporte generado
         $dataReport = [];
         foreach ($allInvoices as $invoices) {
             $warning = false;
@@ -84,10 +77,11 @@ class ActivityController extends Controller
                     $totalValue += $value;
                     $totalComission += ($value * $invoice->comissao_cn / 100);
                 }
-                //obtener costo fijo de cada consultor
+
                 $fixedCost = DB::table("cao_salario")->where("co_usuario", "=", $invoice->co_usuario)->first();
 
                 $dataReport[] = [
+                    'profit' => ($totalValue - ($totalComission + ($fixedCost ? $fixedCost->brut_salario : 0))),
                     'comission' => $totalComission,
                     'fixedCost' => $fixedCost ? $fixedCost->brut_salario : 'N/A',
                     'netIncome' => $totalValue,
@@ -99,7 +93,7 @@ class ActivityController extends Controller
             }
         }
 
-        return view('report', compact('dataReport', 'warning'));
+        return view('report', compact('dataReport', 'warning', 'startDate', 'endDate'));
     }
 
 }
