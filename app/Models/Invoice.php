@@ -22,4 +22,9 @@ class Invoice extends Model
         'comissao_cn',
         'total_imp_inc',
     ];
+
+    public function consultantUser()
+    {
+        return $this->belongsTo(Client::class, 'co_cliente');
+    }
 }

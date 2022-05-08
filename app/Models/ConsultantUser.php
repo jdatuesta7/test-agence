@@ -49,4 +49,9 @@ class ConsultantUser extends Model
     {
         return $this->hasMany(SystemPermission::class, 'co_usuario');
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'co_cliente');
+    }
 }

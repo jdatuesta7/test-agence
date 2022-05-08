@@ -2088,11 +2088,7 @@ var Global = /*#__PURE__*/function () {
       var selectedUsersTbody = document.getElementById('selected-users-tbody');
       var btns = document.getElementsByClassName('btn-move');
 
-      if (selectedUsersTbody == null) {
-        return;
-      }
-
-      if (btns == null) {
+      if (selectedUsersTbody == null || btns == null) {
         return;
       }
 
@@ -2294,15 +2290,18 @@ var Global = /*#__PURE__*/function () {
   }, {
     key: "generateReport",
     value: function generateReport() {
-      var btn = document.getElementById('report-btn');
-      btn.addEventListener('click', function (e) {
+      var reportBtn = document.getElementById('report-btn');
+      var startDateInput = document.getElementById('start-date');
+      var endDateInput = document.getElementById('end-date');
+      var form = document.getElementById('form');
+      var selectedUserTbody = document.getElementById('selected-users-tbody');
+
+      if (reportBtn == null || startDateInput == null || endDateInput == null || form == null || selectedUserTbody == null) {
+        return;
+      }
+
+      reportBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        var selectedUserTbody = document.getElementById('selected-users-tbody');
-
-        if (selectedUserTbody == null) {
-          return;
-        }
-
         var selectedUsersRows = selectedUserTbody.children;
 
         if (selectedUsersRows.length == 0) {
@@ -2317,8 +2316,14 @@ var Global = /*#__PURE__*/function () {
         }
 
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        var form = document.getElementById('form');
-        form.submit();
+
+        if (startDateInput.value == '' || endDateInput.value == '') {
+          form.submit();
+        } else {
+          form.setAttribute('action', "/activity-report/?startDate=".concat(startDateInput.value, "&endDate=").concat(endDateInput.value));
+          form.submit();
+          console.log(startDateInput.value, endDateInput.value);
+        }
       });
     }
   }]);

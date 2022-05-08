@@ -8,11 +8,7 @@ export default class Global {
         const selectedUsersTbody = document.getElementById('selected-users-tbody');
         let btns = document.getElementsByClassName('btn-move');
 
-        if (selectedUsersTbody == null) {
-            return;
-        }
-
-        if (btns == null) {
+        if (selectedUsersTbody == null || btns == null) {
             return;
         }
 
@@ -50,7 +46,7 @@ export default class Global {
                                     <td>No hay consultores disponibles</td>
                                 `;
                             avaliableUsersTbody.appendChild(tr);
-                        }else{
+                        } else {
                             const trEmpty = document.getElementById('avalaible-empty-row');
                             if (trEmpty != null) {
                                 trEmpty.remove();
@@ -72,60 +68,60 @@ export default class Global {
                             'X-CSRF-TOKEN': token,
                         }
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        const idUser = data.data.co_usuario;
-                        const nameUser = data.data.no_usuario;
-                        // añadir campo oculto con la id del usuario
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'selected_users[]';
-                        input.value = idUser;
-                        input.id = idUser;
+                        .then(response => response.json())
+                        .then(data => {
+                            const idUser = data.data.co_usuario;
+                            const nameUser = data.data.no_usuario;
+                            // añadir campo oculto con la id del usuario
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selected_users[]';
+                            input.value = idUser;
+                            input.id = idUser;
 
-                        const form = document.getElementById('form');
-                        form.appendChild(input);
-                        
-                        // añadir usuario a la tabla de usuarios seleccionados
-                        const tr = document.createElement('tr');
-                        tr.setAttribute('id', idUser);
-                        tr.id = idUser;
-                        tr.innerHTML = `
+                            const form = document.getElementById('form');
+                            form.appendChild(input);
+
+                            // añadir usuario a la tabla de usuarios seleccionados
+                            const tr = document.createElement('tr');
+                            tr.setAttribute('id', idUser);
+                            tr.id = idUser;
+                            tr.innerHTML = `
                             <td style="vertical-align:middle;">${nameUser}</td>
                         `;
 
-                        const tdBtn = document.createElement('td');
-                        tdBtn.setAttribute('align', 'center');
+                            const tdBtn = document.createElement('td');
+                            tdBtn.setAttribute('align', 'center');
 
-                        if (btn.hasChildNodes() && btn.firstChild) {
-                            btn.removeChild(btn.firstChild);
-                        }
+                            if (btn.hasChildNodes() && btn.firstChild) {
+                                btn.removeChild(btn.firstChild);
+                            }
 
-                        btn.setAttribute('class', 'btn-move btn btn-danger');
-                        btn.setAttribute('type', 'button');
-                        btn.innerHTML = '<i class="bx bx-chevron-left bx-sm"></i>';
-                        tdBtn.appendChild(btn);
-                        tr.appendChild(tdBtn);
-                        selectedUsersTbody.appendChild(tr);
+                            btn.setAttribute('class', 'btn-move btn btn-danger');
+                            btn.setAttribute('type', 'button');
+                            btn.innerHTML = '<i class="bx bx-chevron-left bx-sm"></i>';
+                            tdBtn.appendChild(btn);
+                            tr.appendChild(tdBtn);
+                            selectedUsersTbody.appendChild(tr);
 
-                        // ordenar tabla de consultores seleccionados por nombre
-                        const trs = selectedUsersTbody.children;
-                        const trsArray = [];
+                            // ordenar tabla de consultores seleccionados por nombre
+                            const trs = selectedUsersTbody.children;
+                            const trsArray = [];
 
-                        for (let i = 0; i < trs.length; i++) {
-                            trsArray.push(trs[i]);
-                        }
+                            for (let i = 0; i < trs.length; i++) {
+                                trsArray.push(trs[i]);
+                            }
 
-                        trsArray.sort(function (a, b) {
-                            const textA = a.innerText.toUpperCase();
-                            const textB = b.innerText.toUpperCase();
-                            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            trsArray.sort(function (a, b) {
+                                const textA = a.innerText.toUpperCase();
+                                const textB = b.innerText.toUpperCase();
+                                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            });
+
+                            for (let i = 0; i < trsArray.length; i++) {
+                                selectedUsersTbody.appendChild(trsArray[i]);
+                            }
                         });
-
-                        for (let i = 0; i < trsArray.length; i++) {
-                            selectedUsersTbody.appendChild(trsArray[i]);
-                        }
-                    });
 
                     // Mover usuario a la tabla de consultores disponibles
                 } else if (tableParent == 'selected-users-tbody') {
@@ -138,99 +134,102 @@ export default class Global {
                             'X-CSRF-TOKEN': token,
                         }
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        const idUser = btn.parentNode.parentNode.id;
-                        const nameUser = data.data.no_usuario;
-                        
-                        // remover el campo oculto con la id del usuario
-                        const input = document.getElementById(idUser);
-                        if (input != null) {
-                            input.remove();
-                        }
+                        .then(response => response.json())
+                        .then(data => {
+                            const idUser = btn.parentNode.parentNode.id;
+                            const nameUser = data.data.no_usuario;
 
-                        // remover el usuario de la tabla de usuarios seleccionados
-                        const trSelected = document.getElementById(idUser);
-                        if (trSelected != null) {
-                            trSelected.remove();
-                        }
+                            // remover el campo oculto con la id del usuario
+                            const input = document.getElementById(idUser);
+                            if (input != null) {
+                                input.remove();
+                            }
 
-                        // Agregar fila de aviso de que no hay usuarios seleccionados despues de remover todos
-                        const selectedUsersLength = selectedUsersTbody.children.length;
-                        if (selectedUsersLength == 0) {
-                            const tr = document.createElement('tr');
-                            tr.setAttribute('id', 'selected-empty-row');
-                            tr.innerHTML = `
+                            // remover el usuario de la tabla de usuarios seleccionados
+                            const trSelected = document.getElementById(idUser);
+                            if (trSelected != null) {
+                                trSelected.remove();
+                            }
+
+                            // Agregar fila de aviso de que no hay usuarios seleccionados despues de remover todos
+                            const selectedUsersLength = selectedUsersTbody.children.length;
+                            if (selectedUsersLength == 0) {
+                                const tr = document.createElement('tr');
+                                tr.setAttribute('id', 'selected-empty-row');
+                                tr.innerHTML = `
                                     <td>No ha seleccionado consultores</td>
                                 `;
-                            selectedUsersTbody.appendChild(tr);
-                        }
+                                selectedUsersTbody.appendChild(tr);
+                            }
 
-                        // devolver usuario a la tabla de consultores disponibles
-                        const tr = document.createElement('tr');
-                        tr.setAttribute('id', idUser);
-                        tr.id = idUser;
-                        tr.innerHTML = `
+                            // devolver usuario a la tabla de consultores disponibles
+                            const tr = document.createElement('tr');
+                            tr.setAttribute('id', idUser);
+                            tr.id = idUser;
+                            tr.innerHTML = `
                             <td style="vertical-align:middle;">${nameUser}</td>
                         `;
 
-                        const tdBtn = document.createElement('td');
-                        tdBtn.setAttribute('align', 'center');
+                            const tdBtn = document.createElement('td');
+                            tdBtn.setAttribute('align', 'center');
 
-                        if (btn.hasChildNodes() && btn.firstChild) {
-                            btn.removeChild(btn.firstChild);
-                        }
-
-                        btn.setAttribute('class', 'btn-move btn btn-primary');
-                        btn.innerHTML = '<i class="bx bx-chevron-right bx-sm"></i>';
-                        tdBtn.appendChild(btn);
-                        tr.appendChild(tdBtn);
-                        avaliableUsersTbody.appendChild(tr);
-
-                        // remover fila de aviso de que no hay usuarios despues de devolver al menos un usuario
-                        let avaliableUsersLength = avaliableUsersTbody.children.length;
-
-                        if(avaliableUsersLength > 1){
-                            const trEmpty = document.getElementById('avalaible-empty-row');
-                            if (trEmpty != null) {
-                                trEmpty.remove();
+                            if (btn.hasChildNodes() && btn.firstChild) {
+                                btn.removeChild(btn.firstChild);
                             }
-                        }
-                        
-                        // ordenar tabla de consultores disponibles por nombre
-                        const trs = avaliableUsersTbody.children;
-                        const trsArray = [];
 
-                        for (let i = 0; i < trs.length; i++) {
-                            trsArray.push(trs[i]);
-                        }
+                            btn.setAttribute('class', 'btn-move btn btn-primary');
+                            btn.innerHTML = '<i class="bx bx-chevron-right bx-sm"></i>';
+                            tdBtn.appendChild(btn);
+                            tr.appendChild(tdBtn);
+                            avaliableUsersTbody.appendChild(tr);
 
-                        trsArray.sort(function (a, b) {
-                            const textA = a.innerText.toUpperCase();
-                            const textB = b.innerText.toUpperCase();
-                            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            // remover fila de aviso de que no hay usuarios despues de devolver al menos un usuario
+                            let avaliableUsersLength = avaliableUsersTbody.children.length;
+
+                            if (avaliableUsersLength > 1) {
+                                const trEmpty = document.getElementById('avalaible-empty-row');
+                                if (trEmpty != null) {
+                                    trEmpty.remove();
+                                }
+                            }
+
+                            // ordenar tabla de consultores disponibles por nombre
+                            const trs = avaliableUsersTbody.children;
+                            const trsArray = [];
+
+                            for (let i = 0; i < trs.length; i++) {
+                                trsArray.push(trs[i]);
+                            }
+
+                            trsArray.sort(function (a, b) {
+                                const textA = a.innerText.toUpperCase();
+                                const textB = b.innerText.toUpperCase();
+                                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            });
+
+                            for (let i = 0; i < trsArray.length; i++) {
+                                avaliableUsersTbody.appendChild(trsArray[i]);
+                            }
+
                         });
-
-                        for (let i = 0; i < trsArray.length; i++) {
-                            avaliableUsersTbody.appendChild(trsArray[i]);
-                        }
-
-                    });
                 }
             });
         });
     }
 
     generateReport() {
-        const btn = document.getElementById('report-btn');
-        btn.addEventListener('click', (e) => {
+        const reportBtn = document.getElementById('report-btn');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const form = document.getElementById('form');
+        const selectedUserTbody = document.getElementById('selected-users-tbody');
+
+        if (reportBtn == null || startDateInput == null || endDateInput == null || form == null || selectedUserTbody == null) {
+            return;
+        }
+
+        reportBtn.addEventListener('click', (e) => {
             e.preventDefault();
-
-            const selectedUserTbody = document.getElementById('selected-users-tbody');
-
-            if (selectedUserTbody == null) {
-                return;
-            }
 
             const selectedUsersRows = selectedUserTbody.children;
 
@@ -239,7 +238,6 @@ export default class Global {
                 return;
             }
 
-
             const selectedIdUsers = [];
 
             for (let i = 0; i < selectedUsersRows.length; i++) {
@@ -247,9 +245,17 @@ export default class Global {
             }
 
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const form = document.getElementById('form');
-            form.submit();
+
+            if (startDateInput.value == '' || endDateInput.value == '') {
+                form.submit();
+            }else{
+                form.setAttribute('action', `/activity-report/?startDate=${startDateInput.value}&endDate=${endDateInput.value}`);
+                form.submit();
+                console.log(startDateInput.value, endDateInput.value);
+            }
+
 
         });
     }
+
 }
