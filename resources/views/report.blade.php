@@ -1,15 +1,15 @@
 @extends('app')
 
 <div class="p-4">
-    <h1 class="text-center mt-2 mb-4"> REPORTE DE FACTURAS OBTENIDAS</h1>
-    <h1 class="text-center mt-2 mb-4">{{ $startDate && $endDate ? ('PERIODOS '. $startDate - $endDate) : 'TODOS LOS PERIODOS' }}</h1>
+    <h2 class="text-center mt-2 mb-4"> REPORTE DE FACTURAS OBTENIDAS</h1>
+    <h2 class="text-center mt-2 mb-4">{{ $startDate && $endDate ? 'PERIODOS DESDE '.$startDate.' HASTA '.$endDate : 'TODOS LOS PERIODOS' }}</h1>
 
     @foreach ($dataReport as $item)
     <div class="row gap-1 mt-4">
         <div class="col-md-12 col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Reporte de {{ $item['user']->no_usuario}} </h3>
+                    <h3 class="card-title">{{ $item['user']->no_usuario}} </h3>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive">
