@@ -1,7 +1,10 @@
+import Chart from 'chart.js/auto';
+
 export default class Global {
     initialize() {
         this.moveConsultantUser();
         this.generateReport();
+        this.showGraph();
     }
 
     moveConsultantUser() {
@@ -248,13 +251,146 @@ export default class Global {
 
             if (startDateInput.value == '' || endDateInput.value == '') {
                 form.submit();
-            }else{
+            } else {
                 form.setAttribute('action', `/activity-report/?startDate=${startDateInput.value}&endDate=${endDateInput.value}`);
                 form.submit();
                 console.log(startDateInput.value, endDateInput.value);
             }
 
 
+        });
+    }
+
+    showGraph() {
+        const getDataBtn = document.getElementById('graph-btn');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const selectedUserTbody = document.getElementById('selected-users-tbody');
+        const modalBtn = document.getElementById('modal-btn');
+
+        if (modalBtn == null || startDateInput == null || endDateInput == null || selectedUserTbody == null || getDataBtn == null) {
+            return;
+        }
+
+
+        getDataBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const selectedUsersRows = selectedUserTbody.children;
+            const emptyRow = document.getElementById('selected-empty-row');
+
+            if (emptyRow != null) {
+                alert('No hay consultores seleccionados');
+                return;
+            }
+
+            const selectedIdUsers = [];
+            for (let i = 0; i < selectedUsersRows.length; i++) {
+                selectedIdUsers.push(selectedUsersRows[i].id);
+            }
+
+            if (startDateInput.value == '' || endDateInput.value == '') {
+                alert('No ha seleccionado un rango de fecha');
+                return;
+            }
+
+            const _data = {
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                idUsers: selectedIdUsers
+            };
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch('/data-graph', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token, "Content-type": "application/json; charset=UTF-8" },
+                body: JSON.stringify(_data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.code != 200) {
+                        alert(data.data);
+                        return;
+                    }
+
+                    modalBtn.click();
+
+                    console.log(data);
+
+                    const labels = [];
+                    const avgFixedCost = [];
+                    for (let i = 0; i < data.months.length; i++) {
+                        labels.push(data.months[i]);
+                        avgFixedCost.push(data.avgFixedCost);
+                    }
+
+                    const datasets = [];
+                    datasets.push({
+                        type: 'line',
+                        label: 'Costo fijo promedio',
+                        backgroundColor: '#F44336',
+                        borderColor: '#D32F2F',
+                        pointBackgroundColor: '#FFFFFF',
+                        fill: false,
+                        data: avgFixedCost
+                    });
+
+                    for (let i = 0; i < data.dataGraph.length; i++) {
+
+                        let netIncomeData = [];
+                        for (let y = 0; y < data.months.length; y++) {
+                            if (data.dataGraph[i].user.co_usuario == data.users[i].co_usuario) {
+                                if (data.dataGraph[i].netIncome[y].month == data.months[y]) {
+                                    netIncomeData.push(data.dataGraph[i].netIncome[y].value);
+                                }
+                            }
+                        }
+
+                        let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                        datasets.push({
+                            type: 'bar',
+                            label: data.users[i].no_usuario,
+                            backgroundColor: color,
+                            data: netIncomeData,
+                        });
+                    }
+
+                    const dataGraph = {
+                        labels: labels,
+                        datasets: datasets
+                    };
+
+                    const startDate = new Date(startDateInput.value);
+                    const endDate = new Date(endDateInput.value);
+                    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+                    const config = {
+                        type: 'line',
+                        data: dataGraph,
+                        options: {
+                            plugins: {
+                                title: {
+                                    text: `Rendimiento de consultores del ${startDate.toLocaleDateString("es-ES", dateOptions)} a ${endDate.toLocaleDateString("es-ES", dateOptions)}`,
+                                    display: true
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    suggestedMin: 0,
+                                    suggestedMax: labels.length,
+                                },
+                            },
+                        },
+                    };
+
+                    window.Chart = Chart;
+                    const timeComboChart = new Chart(
+                        document.getElementById('data-graph'),
+                        config
+                    );
+                });
         });
     }
 

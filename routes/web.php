@@ -19,3 +19,6 @@ Route::get('/', [ActivityController::class, 'index']);
 Route::get('/consultant-user/{co_usuario}', [ActivityController::class, 'getConsultantUser']);
 
 Route::post('/activity-report', [ActivityController::class, 'generateReport']);
+
+Route::post('/data-graph', [ActivityController::class, 'showGraph']);
+

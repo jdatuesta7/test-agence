@@ -3,6 +3,12 @@
 <div class="p-4">
     <h1 class="text-center mt-2 mb-4">Control de actividades</h1>
 
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
     @include('filter')
 
     <div class="row">
@@ -87,11 +93,16 @@
                     class='bx bxs-report'></i></button>
         </div>
         <div class="col-md-2 col-12">
-            <button type="button" class="btn btn-secondary btn-block col-12">Gráfico <i
+            <button id="graph-btn" type="button" class="btn btn-secondary btn-block col-12">Gráfico <i
                     class='bx bx-line-chart'></i></button>
+            <button id="modal-btn" hidden tabindex="-1" type="button" data-toggle="modal" data-bs-toggle="modal"
+                data-bs-target="#graph-modal"></button>
         </div>
         <div class="col-md-2 col-12">
             <button type="button" class="btn btn-success btn-block col-12">Pizza <i class='bx bxs-pizza'></i></button>
         </div>
     </div>
+
+
+    @include('graph')
 </div>
