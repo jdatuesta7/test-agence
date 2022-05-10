@@ -22,3 +22,5 @@ Route::post('/activity-report', [ActivityController::class, 'generateReport']);
 
 Route::post('/data-graph', [ActivityController::class, 'showGraph']);
 
+Route::post('/data-pizza', [ActivityController::class, 'showPizza']);
+

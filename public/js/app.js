@@ -2085,6 +2085,7 @@ var Global = /*#__PURE__*/function () {
       this.moveConsultantUser();
       this.generateReport();
       this.showGraph();
+      this.showPizzaGraph();
     }
   }, {
     key: "moveConsultantUser",
@@ -2326,7 +2327,6 @@ var Global = /*#__PURE__*/function () {
         } else {
           form.setAttribute('action', "/activity-report/?startDate=".concat(startDateInput.value, "&endDate=").concat(endDateInput.value));
           form.submit();
-          console.log(startDateInput.value, endDateInput.value);
         }
       });
     }
@@ -2380,15 +2380,12 @@ var Global = /*#__PURE__*/function () {
         }).then(function (response) {
           return response.json();
         }).then(function (data) {
-          console.log(data);
-
           if (data.code != 200) {
             alert(data.data);
             return;
           }
 
           modalBtn.click();
-          console.log(data);
           var labels = [];
           var avgFixedCost = [];
 
@@ -2459,6 +2456,132 @@ var Global = /*#__PURE__*/function () {
           };
           window.Chart = chart_js_auto__WEBPACK_IMPORTED_MODULE_0__["default"];
           var timeComboChart = new chart_js_auto__WEBPACK_IMPORTED_MODULE_0__["default"](document.getElementById('data-graph'), config);
+          modalBtn.click();
+        });
+      });
+    }
+  }, {
+    key: "showPizzaGraph",
+    value: function showPizzaGraph() {
+      var getDataBtn = document.getElementById('pizza-btn');
+      var startDateInput = document.getElementById('start-date');
+      var endDateInput = document.getElementById('end-date');
+      var selectedUserTbody = document.getElementById('selected-users-tbody');
+      var modalBtn = document.getElementById('modal-pizza-btn');
+
+      if (modalBtn == null || selectedUserTbody == null || getDataBtn == null) {
+        return;
+      }
+
+      var PieChart;
+      getDataBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var selectedUsersRows = selectedUserTbody.children;
+        var emptyRow = document.getElementById('selected-empty-row');
+
+        if (emptyRow != null) {
+          alert('No hay consultores seleccionados');
+          return;
+        }
+
+        var selectedIdUsers = [];
+
+        for (var i = 0; i < selectedUsersRows.length; i++) {
+          selectedIdUsers.push(selectedUsersRows[i].id);
+        }
+
+        var _data = {
+          startDate: startDateInput.value == '' ? false : startDateInput.value,
+          endDate: endDateInput.value == '' ? false : endDateInput.value,
+          idUsers: selectedIdUsers
+        };
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        fetch('/data-pizza', {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': token,
+            "Content-type": "application/json; charset=UTF-8"
+          },
+          body: JSON.stringify(_data)
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          if (data.code != 200) {
+            alert(data.data);
+            return;
+          } //obtener total ingresos netos
+
+
+          var totalNetIncome = 0;
+
+          for (var _i5 = 0; _i5 < data.data.length; _i5++) {
+            totalNetIncome += data.data[_i5].netIncome;
+          } //obtener cada porcentaje de los ingresos netos de cada usuario
+
+
+          var pctNetIncome = [];
+
+          for (var _i6 = 0; _i6 < data.data.length; _i6++) {
+            var pctByUser = {
+              porcentage: (data.data[_i6].netIncome / totalNetIncome * 100).toFixed(1),
+              user: data.data[_i6].user
+            };
+            pctNetIncome.push(pctByUser);
+          }
+
+          var labels = [];
+          var percentages = [];
+          var datasets = [];
+          var colors = [];
+
+          for (var _i7 = 0; _i7 < pctNetIncome.length; _i7++) {
+            labels.push(pctNetIncome[_i7].user.no_usuario);
+            percentages.push(pctNetIncome[_i7].porcentage);
+            colors.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+          }
+
+          datasets.push({
+            label: labels,
+            data: percentages,
+            backgroundColor: colors
+          });
+          var dataPizza = {
+            labels: labels,
+            datasets: datasets
+          };
+          var config = {
+            type: 'pie',
+            data: dataPizza,
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top'
+                },
+                title: {
+                  display: true,
+                  text: 'Participacion en ingresos netos'
+                },
+                tooltips: {
+                  callbacks: {
+                    label: function label(tooltipItem, data) {
+                      var dataset = data.datasets[tooltipItem.datasetIndex];
+                      var currentValue = dataset.data[tooltipItem.index];
+                      return currentValue + '%';
+                    }
+                  }
+                }
+              }
+            }
+          };
+
+          if (PieChart) {
+            PieChart.destroy();
+          }
+
+          window.Chart = chart_js_auto__WEBPACK_IMPORTED_MODULE_0__["default"];
+          PieChart = new chart_js_auto__WEBPACK_IMPORTED_MODULE_0__["default"](document.getElementById('data-pizza'), config);
+          modalBtn.click();
         });
       });
     }

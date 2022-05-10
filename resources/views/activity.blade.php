@@ -95,14 +95,16 @@
         <div class="col-md-2 col-12">
             <button id="graph-btn" type="button" class="btn btn-secondary btn-block col-12">Gráfico <i
                     class='bx bx-line-chart'></i></button>
-            <button id="modal-btn" hidden tabindex="-1" type="button" data-toggle="modal" data-bs-toggle="modal"
+            <button hidden id="modal-btn" tabindex="-1" type="button" data-toggle="modal" data-bs-toggle="modal"
                 data-bs-target="#graph-modal"></button>
         </div>
         <div class="col-md-2 col-12">
-            <button type="button" class="btn btn-success btn-block col-12">Pizza <i class='bx bxs-pizza'></i></button>
+            <button id="pizza-btn" type="button" class="btn btn-success btn-block col-12">Pizza <i class='bx bxs-pizza'></i></button>
+            <button hidden id="modal-pizza-btn" hidden tabindex="-1" type="button" data-toggle="modal" data-bs-toggle="modal"
+                data-bs-target="#pizza-modal"></button>
         </div>
     </div>
 
-
     @include('graph')
+    @include('pizza')
 </div>

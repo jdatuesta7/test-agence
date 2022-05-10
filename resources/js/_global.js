@@ -5,6 +5,7 @@ export default class Global {
         this.moveConsultantUser();
         this.generateReport();
         this.showGraph();
+        this.showPizzaGraph();
     }
 
     moveConsultantUser() {
@@ -254,7 +255,6 @@ export default class Global {
             } else {
                 form.setAttribute('action', `/activity-report/?startDate=${startDateInput.value}&endDate=${endDateInput.value}`);
                 form.submit();
-                console.log(startDateInput.value, endDateInput.value);
             }
 
 
@@ -309,15 +309,12 @@ export default class Global {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.code != 200) {
                         alert(data.data);
                         return;
                     }
 
                     modalBtn.click();
-
-                    console.log(data);
 
                     const labels = [];
                     const avgFixedCost = [];
@@ -390,6 +387,136 @@ export default class Global {
                         document.getElementById('data-graph'),
                         config
                     );
+
+                    modalBtn.click();
+                });
+        });
+    }
+
+    showPizzaGraph() {
+        const getDataBtn = document.getElementById('pizza-btn');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const selectedUserTbody = document.getElementById('selected-users-tbody');
+        const modalBtn = document.getElementById('modal-pizza-btn');
+
+        if (modalBtn == null || selectedUserTbody == null || getDataBtn == null) {
+            return;
+        }
+
+        let PieChart;
+
+        getDataBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const selectedUsersRows = selectedUserTbody.children;
+            const emptyRow = document.getElementById('selected-empty-row');
+
+            if (emptyRow != null) {
+                alert('No hay consultores seleccionados');
+                return;
+            }
+
+            const selectedIdUsers = [];
+            for (let i = 0; i < selectedUsersRows.length; i++) {
+                selectedIdUsers.push(selectedUsersRows[i].id);
+            }
+
+            const _data = {
+                startDate: startDateInput.value == '' ? false : startDateInput.value,
+                endDate: endDateInput.value == '' ? false : endDateInput.value,
+                idUsers: selectedIdUsers
+            };
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch('/data-pizza', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token, "Content-type": "application/json; charset=UTF-8" },
+                body: JSON.stringify(_data)
+
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code != 200) {
+                        alert(data.data);
+                        return;
+                    }
+
+                    //obtener total ingresos netos
+                    let totalNetIncome = 0;
+                    for (let i = 0; i < data.data.length; i++) {
+                        totalNetIncome += data.data[i].netIncome;
+                    }
+
+                    //obtener cada porcentaje de los ingresos netos de cada usuario
+                    let pctNetIncome = [];
+                    for (let i = 0; i < data.data.length; i++) {
+                        let pctByUser = {
+                            porcentage: ((data.data[i].netIncome/totalNetIncome)*100).toFixed(1),
+                            user: data.data[i].user
+                        }
+                        pctNetIncome.push(pctByUser);
+                    }
+
+                    let labels = [];
+                    let percentages = [];
+                    let datasets = [];
+                    let colors = [];
+                    for (let i = 0; i < pctNetIncome.length; i++) {
+                        labels.push(pctNetIncome[i].user.no_usuario);
+                        percentages.push(pctNetIncome[i].porcentage);
+                        colors.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+                    }
+
+                    datasets.push({
+                        label: labels,
+                        data: percentages,
+                        backgroundColor: colors,
+                    });
+                    
+                    const dataPizza = {
+                        labels: labels,
+                        datasets: datasets
+                    };
+
+                    const config = {
+                        type: 'pie',
+                        data: dataPizza,
+                        options: {
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              position: 'top',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Participacion en ingresos netos'
+                            },
+                            tooltips: {
+                                callbacks: {
+                                    label: function(tooltipItem, data) {
+                                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                                        var currentValue = dataset.data[tooltipItem.index];
+                                        return currentValue+'%';
+                                    }
+                                }
+                            }
+                          }
+                        },
+                      };
+
+                    if (PieChart) {
+                        PieChart.destroy();
+                    }
+
+                    window.Chart = Chart;
+                    PieChart = new Chart(
+                        document.getElementById('data-pizza'),
+                        config
+                    );
+
+                    modalBtn.click();
                 });
         });
     }

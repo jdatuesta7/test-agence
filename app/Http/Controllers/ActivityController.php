@@ -151,8 +151,6 @@ class ActivityController extends Controller
         $dataGraph = [];
         $totalFixedCost = 0;
 
-        // dd($idUsers);
-
         foreach ($invoicesByUser as $invoicesUser) {
             $warning = false;
 
@@ -190,12 +188,66 @@ class ActivityController extends Controller
         $avgFixedCost = $totalFixedCost / count($idUsers);
 
         return response()->json([
-            'code' => 200, 
-            'users' => $consultantUser, 
-            'months' => $months, 
-            'dataGraph' => $dataGraph, 
+            'code' => 200,
+            'users' => $consultantUser,
+            'months' => $months,
+            'dataGraph' => $dataGraph,
             'avgFixedCost' => $avgFixedCost,
             'warning' => $warning
+        ], 200);
+    }
+
+    public function showPizza(Request $request)
+    {
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+        $idUsers = $request->idUsers;
+
+        if (!$idUsers) {
+            return response()->json(['code' => 404, 'data' => 'Usuarios no encontrados'], 404);
+        }
+
+        //obtener todos los consultores seleccionados
+        $consultantUser = [];
+        foreach ($idUsers as $idUser) {
+            $consultantUser[] = ConsultantUser::find($idUser);
+        }
+
+        //obtener las facturas correspondientes a cada consultor
+        $invoicesByUser = $this->getInvoices($idUsers, $startDate, $endDate);
+
+        //verificar que exista algun consultor que tenga facturas
+        $existInvoices = false;
+        foreach ($invoicesByUser as $invoices) {
+            if (count($invoices) != 0) {
+                $existInvoices = true;
+                break;
+            }
+        }
+
+        if (!$existInvoices) {
+            return response()->json(['code' => 404, 'data' => 'Facturas no encontradas'], 404);
+        }
+
+        //obtener datos para la pizza
+        $dataPizza = [];
+        foreach ($invoicesByUser as $invoices) {
+            if (count(($invoices)) != 0) {
+                $totalValue = 0;
+                foreach ($invoices as $invoice) {
+                    $value = $invoice->valor - ($invoice->valor * $invoice->total_imp_inc / 100);
+                    $totalValue += $value;
+                }
+
+                $dataPizza[] = [
+                    'netIncome' => $totalValue,
+                    'user' => $consultantUser[array_search($invoice->co_usuario, $idUsers)]
+                ];
+            }
+        }
+
+        return response()->json([
+            'code' => 200, 'data' => $dataPizza
         ], 200);
     }
 }
