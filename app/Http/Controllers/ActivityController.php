@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ConsultantUser;
-use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

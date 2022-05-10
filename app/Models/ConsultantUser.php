@@ -45,11 +45,6 @@ class ConsultantUser extends Model
         'dt_expedicao'
     ];
 
-    public function systemPermissions()
-    {
-        return $this->hasMany(SystemPermission::class, 'co_usuario');
-    }
-
     public function invoices()
     {
         return $this->hasMany(Invoice::class, 'co_cliente');
