@@ -394,6 +394,8 @@ export default class Global {
                     );
 
                     modalBtn.click();
+                }).catch(err => {
+                    console.log(err);
                 });
         });
     }
