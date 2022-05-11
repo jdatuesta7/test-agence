@@ -272,6 +272,7 @@ export default class Global {
             return;
         }
 
+        let timeComboChart;
 
         getDataBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -382,8 +383,12 @@ export default class Global {
                         },
                     };
 
+                    if (timeComboChart) {
+                        timeComboChart.destroy();
+                    }
+
                     window.Chart = Chart;
-                    const timeComboChart = new Chart(
+                    timeComboChart = new Chart(
                         document.getElementById('data-graph'),
                         config
                     );
