@@ -335,11 +335,28 @@ export default class Global {
                         data: avgFixedCost
                     });
 
+                    
+                    const usersData = Object.entries(data.users);
+                    let users = [];
+                    if (data.warning) {
+                        let user, userData;
+                        for (let i = 0; i < usersData.length; i++) {
+                            userData = usersData[i];
+                            user = {
+                                co_usuario: userData[1].co_usuario,
+                                no_usuario: userData[1].no_usuario,
+                            }
+                            users.push(user);
+                        }
+                    }else{
+                        users = data.users;
+                    }
+
                     for (let i = 0; i < data.dataGraph.length; i++) {
 
                         let netIncomeData = [];
                         for (let y = 0; y < data.months.length; y++) {
-                            if (data.dataGraph[i].user.co_usuario == data.users[i].co_usuario) {
+                            if (data.dataGraph[i].user.co_usuario == users[i].co_usuario) {
                                 if (data.dataGraph[i].netIncome[y].month == data.months[y]) {
                                     netIncomeData.push(data.dataGraph[i].netIncome[y].value);
                                 }
@@ -349,7 +366,7 @@ export default class Global {
                         let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
                         datasets.push({
                             type: 'bar',
-                            label: data.users[i].no_usuario,
+                            label: users[i].no_usuario,
                             backgroundColor: color,
                             data: netIncomeData,
                         });
@@ -368,6 +385,7 @@ export default class Global {
                         type: 'line',
                         data: dataGraph,
                         options: {
+                            responsive: true,
                             plugins: {
                                 title: {
                                     text: `Rendimiento de consultores del ${startDate.toLocaleDateString("es-ES", dateOptions)} a ${endDate.toLocaleDateString("es-ES", dateOptions)}`,
@@ -394,8 +412,6 @@ export default class Global {
                     );
 
                     modalBtn.click();
-                }).catch(err => {
-                    console.log(err);
                 });
         });
     }

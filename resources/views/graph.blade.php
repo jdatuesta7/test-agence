@@ -2,7 +2,7 @@
 <div class="modal fade" id="graph-modal" tabindex="-1" aria-labelledby="GraphModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content" style="width: 45em">
+        <div class="modal-content" style="width: auto; height: auto;">
 
             <div class="modal-header">
                 <h5 class="modal-title" id="graphicResultModalLabel">Rendimiento comercial</h5>

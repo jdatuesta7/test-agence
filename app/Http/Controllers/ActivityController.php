@@ -155,12 +155,12 @@ class ActivityController extends Controller
             return response()->json(['code' => 404, 'data' => 'Facturas no encontradas'], 404);
         }
 
-        //OBTENER TOTAL GANANCIAS NETAS POR CADA MES Y USUARIO
         $dataGraph = [];
         $totalFixedCost = 0;
+        $warning = false;
 
-        foreach ($invoicesByUser as $invoicesUser) {
-            $warning = false;
+        //OBTENER TOTAL GANANCIAS NETAS POR CADA MES Y USUARIO
+        foreach ($invoicesByUser as $key => $invoicesUser) {
 
             if (count(($invoicesUser)) != 0) {
                 $totalValue = 0;
@@ -172,6 +172,7 @@ class ActivityController extends Controller
                             $value = $invoice->valor - ($invoice->valor * $invoice->total_imp_inc / 100);
                             $totalValue += $value;
                         }
+                        $user = $invoice->co_usuario;
                     }
                     $netIncomeByMonth[] = [
                         'month' => $month,
@@ -181,15 +182,16 @@ class ActivityController extends Controller
 
                 $dataGraph[] = [
                     'netIncome' => $netIncomeByMonth,
-                    'user' => $consultantUser[array_search($invoicesUser[0]->co_usuario, $idUsers)]
+                    'user' => $consultantUser[array_search($user, $idUsers)]
                 ];
+
+                $fixedCost = DB::table("cao_salario")->where("co_usuario", "=", $user)->first();
+                if ($fixedCost) {
+                    $totalFixedCost += $fixedCost->brut_salario;
+                }
             } else {
                 $warning = true;
-            }
-
-            $fixedCost = DB::table("cao_salario")->where("co_usuario", "=", $invoicesUser[0]->co_usuario)->first();
-            if ($fixedCost) {
-                $totalFixedCost += $fixedCost->brut_salario;
+                unset($consultantUser[$key]);
             }
         }
 

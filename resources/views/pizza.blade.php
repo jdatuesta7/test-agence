@@ -2,7 +2,7 @@
 <div class="modal fade" id="pizza-modal" tabindex="-1" aria-labelledby="PizzaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content" style="width: 35em">
+        <div class="modal-content" style="width: auto">
 
             <div class="modal-header">
                 <h5 class="modal-title" id="PizzaResultModalLabel">Participacion en ingresos netos</h5>
