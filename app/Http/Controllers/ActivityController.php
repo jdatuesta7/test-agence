@@ -142,7 +142,16 @@ class ActivityController extends Controller
         //obtener las facturas correspondientes a cada consultor
         $invoicesByUser = $this->getInvoices($idUsers, $startDate, $endDate);
 
-        if (count($invoicesByUser[0]) == 0) {
+        //verificar que exista algun consultor que tenga facturas
+        $existInvoices = false;
+        foreach ($invoicesByUser as $invoices) {
+            if (count($invoices) != 0) {
+                $existInvoices = true;
+                break;
+            }
+        }
+
+        if (!$existInvoices) {
             return response()->json(['code' => 404, 'data' => 'Facturas no encontradas'], 404);
         }
 
