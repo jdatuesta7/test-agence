@@ -2321,13 +2321,7 @@ var Global = /*#__PURE__*/function () {
         }
 
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        if (startDateInput.value == '' || endDateInput.value == '') {
-          form.submit();
-        } else {
-          form.setAttribute('action', "/activity-report/?startDate=".concat(startDateInput.value, "&endDate=").concat(endDateInput.value));
-          form.submit();
-        }
+        form.submit();
       });
     }
   }, {
