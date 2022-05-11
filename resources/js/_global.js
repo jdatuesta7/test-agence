@@ -250,13 +250,7 @@ export default class Global {
 
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            if (startDateInput.value == '' || endDateInput.value == '') {
-                form.submit();
-            } else {
-                form.setAttribute('action', `/activity-report/?startDate=${startDateInput.value}&endDate=${endDateInput.value}`);
-                form.submit();
-            }
-
+            form.submit();
 
         });
     }
