@@ -36,7 +36,7 @@ class ActivityController extends Controller
         $allInvoices = [];
         foreach ($users as $user) {
             $allInvoices[] = DB::table("cao_fatura")
-                ->where("cao_fatura.data_emissao", ">=", $startDate ? $startDate : '0000-00-00')
+                ->where("cao_fatura.data_emissao", ">=", $startDate ? $startDate : '1753-01-01')
                 ->where("cao_fatura.data_emissao", "<=", $endDate ? $endDate : date('Y-m-d'))
                 ->join("cao_os", "cao_fatura.co_os", "=", "cao_os.co_os")
                 ->where("cao_os.co_usuario", "=", $user)
