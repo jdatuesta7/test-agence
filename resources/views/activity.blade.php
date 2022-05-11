@@ -55,6 +55,7 @@
         <div class="col-md-6 col-12 mt-2">
             <form method="POST" id="form" action="activity-report">
                 @csrf
+                @method('POST')
 
                 <div class="card">
                     <div class="card-header">
