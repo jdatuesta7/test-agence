@@ -2405,14 +2405,31 @@ var Global = /*#__PURE__*/function () {
             fill: false,
             data: avgFixedCost
           });
+          var usersData = Object.entries(data.users);
+          var users = [];
 
-          for (var _i4 = 0; _i4 < data.dataGraph.length; _i4++) {
+          if (data.warning) {
+            var user, userData;
+
+            for (var _i4 = 0; _i4 < usersData.length; _i4++) {
+              userData = usersData[_i4];
+              user = {
+                co_usuario: userData[1].co_usuario,
+                no_usuario: userData[1].no_usuario
+              };
+              users.push(user);
+            }
+          } else {
+            users = data.users;
+          }
+
+          for (var _i5 = 0; _i5 < data.dataGraph.length; _i5++) {
             var netIncomeData = [];
 
             for (var y = 0; y < data.months.length; y++) {
-              if (data.dataGraph[_i4].user.co_usuario == data.users[_i4].co_usuario) {
-                if (data.dataGraph[_i4].netIncome[y].month == data.months[y]) {
-                  netIncomeData.push(data.dataGraph[_i4].netIncome[y].value);
+              if (data.dataGraph[_i5].user.co_usuario == users[_i5].co_usuario) {
+                if (data.dataGraph[_i5].netIncome[y].month == data.months[y]) {
+                  netIncomeData.push(data.dataGraph[_i5].netIncome[y].value);
                 }
               }
             }
@@ -2420,7 +2437,7 @@ var Global = /*#__PURE__*/function () {
             var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
             datasets.push({
               type: 'bar',
-              label: data.users[_i4].no_usuario,
+              label: users[_i5].no_usuario,
               backgroundColor: color,
               data: netIncomeData
             });
@@ -2441,6 +2458,7 @@ var Global = /*#__PURE__*/function () {
             type: 'line',
             data: dataGraph,
             options: {
+              responsive: true,
               plugins: {
                 title: {
                   text: "Rendimiento de consultores del ".concat(startDate.toLocaleDateString("es-ES", dateOptions), " a ").concat(endDate.toLocaleDateString("es-ES", dateOptions)),
@@ -2520,17 +2538,17 @@ var Global = /*#__PURE__*/function () {
 
           var totalNetIncome = 0;
 
-          for (var _i5 = 0; _i5 < data.data.length; _i5++) {
-            totalNetIncome += data.data[_i5].netIncome;
+          for (var _i6 = 0; _i6 < data.data.length; _i6++) {
+            totalNetIncome += data.data[_i6].netIncome;
           } //obtener cada porcentaje de los ingresos netos de cada usuario
 
 
           var pctNetIncome = [];
 
-          for (var _i6 = 0; _i6 < data.data.length; _i6++) {
+          for (var _i7 = 0; _i7 < data.data.length; _i7++) {
             var pctByUser = {
-              porcentage: (data.data[_i6].netIncome / totalNetIncome * 100).toFixed(1),
-              user: data.data[_i6].user
+              porcentage: (data.data[_i7].netIncome / totalNetIncome * 100).toFixed(1),
+              user: data.data[_i7].user
             };
             pctNetIncome.push(pctByUser);
           }
@@ -2540,9 +2558,9 @@ var Global = /*#__PURE__*/function () {
           var datasets = [];
           var colors = [];
 
-          for (var _i7 = 0; _i7 < pctNetIncome.length; _i7++) {
-            labels.push(pctNetIncome[_i7].user.no_usuario);
-            percentages.push(pctNetIncome[_i7].porcentage);
+          for (var _i8 = 0; _i8 < pctNetIncome.length; _i8++) {
+            labels.push(pctNetIncome[_i8].user.no_usuario);
+            percentages.push(pctNetIncome[_i8].porcentage);
             colors.push('#' + Math.floor(Math.random() * 16777215).toString(16));
           }
 
